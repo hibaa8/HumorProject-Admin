@@ -3,20 +3,12 @@ import { createServerClient } from "@supabase/ssr";
 
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 const supabaseProjectId = process.env.SUPABASE_PROJECT_ID;
-const projectDerivedUrl = supabaseProjectId
-  ? `https://${supabaseProjectId}.supabase.co`
-  : undefined;
 const supabaseUrl =
-  projectDerivedUrl || process.env.SUPABASE_URL;
+  process.env.SUPABASE_URL ||
+  (supabaseProjectId ? `https://${supabaseProjectId}.supabase.co` : undefined);
 
 export async function middleware(request: NextRequest) {
   if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.next();
-  }
-
-  // Temporary bypass requested by user: allow dashboard access without login.
-  const bypassAuthForNow = true;
-  if (bypassAuthForNow) {
     return NextResponse.next();
   }
 

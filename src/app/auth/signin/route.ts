@@ -1,9 +1,20 @@
 import { NextResponse } from "next/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
+  const supabase = await createSupabaseServerClient();
   const origin = new URL(request.url).origin;
-  const { searchParams } = new URL(request.url);
-  const rawNext = searchParams.get("next");
-  const nextPath = rawNext && rawNext.startsWith("/") ? rawNext : "/admin";
-  return NextResponse.redirect(`${origin}${nextPath}`);
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${origin}/auth/callback`,
+    },
+  });
+
+  if (error || !data?.url) {
+    return NextResponse.redirect(`${origin}/login?error=oauth_start_failed`);
+  }
+
+  return NextResponse.redirect(data.url);
 }
