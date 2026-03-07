@@ -12,6 +12,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // In production, Next.js route prefetch can trigger middleware checks that
+  // may not carry fresh auth state. Skip auth redirects for prefetch requests.
+  const isPrefetch =
+    request.headers.get("purpose") === "prefetch" ||
+    request.headers.has("next-router-prefetch");
+  if (isPrefetch) {
+    return NextResponse.next();
+  }
+
   const response = NextResponse.next({
     request: {
       headers: request.headers,

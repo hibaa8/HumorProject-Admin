@@ -23,7 +23,7 @@ export default async function AdminLayout({
           </div>
           <div className="text-right">
             <p className="text-sm text-zinc-300">{displayName}</p>
-            <Link className="text-xs text-zinc-400 underline" href="/auth/logout">
+            <Link className="text-xs text-zinc-400 underline" href="/auth/logout" prefetch={false}>
               Sign out
             </Link>
           </div>
@@ -32,16 +32,16 @@ export default async function AdminLayout({
 
       <div className="mx-auto grid max-w-7xl gap-8 px-6 py-8 lg:grid-cols-[220px_1fr]">
         <aside className="space-y-2">
-          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin">
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin" prefetch={false}>
             Dashboard
           </Link>
-          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/profiles">
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/profiles" prefetch={false}>
             Profiles (Read)
           </Link>
-          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/images">
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/images" prefetch={false}>
             Images (CRUD)
           </Link>
-          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/captions">
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/captions" prefetch={false}>
             Captions (Read)
           </Link>
         </aside>
