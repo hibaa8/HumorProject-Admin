@@ -9,14 +9,31 @@ const parseNullableText = (value: FormDataEntryValue | null) => {
   return text.length > 0 ? text : null;
 };
 
-export async function createImageAction(formData: FormData) {
-  const { supabase } = await requireSuperadmin();
+export type ImageActionState = {
+  status: "idle" | "success" | "error";
+  message: string;
+};
+
+export async function createImageAction(
+  _prevState: ImageActionState,
+  formData: FormData
+): Promise<ImageActionState> {
+  const { supabase, user } = await requireSuperadmin();
 
   const profileId = parseNullableText(formData.get("profile_id"));
+  const effectiveProfileId = profileId ?? user.id;
+
+  if (profileId && profileId !== user.id) {
+    return {
+      status: "error",
+      message:
+        "Creation blocked by row-level security. For now, set Profile UUID to your own user id or leave it empty.",
+    };
+  }
 
   const { error } = await supabase.from("images").insert({
     url: parseNullableText(formData.get("url")),
-    profile_id: profileId,
+    profile_id: effectiveProfileId,
     image_description: parseNullableText(formData.get("image_description")),
     additional_context: parseNullableText(formData.get("additional_context")),
     celebrity_recognition: parseNullableText(formData.get("celebrity_recognition")),
@@ -25,11 +42,22 @@ export async function createImageAction(formData: FormData) {
   });
 
   if (error) {
-    throw new Error(`Create image failed: ${error.message}`);
+    const isRlsError = /row-level security policy/i.test(error.message);
+    return {
+      status: "error",
+      message: isRlsError
+        ? "Could not create image due to row-level security. Leave Profile UUID empty to use your own account id."
+        : `Could not create image: ${error.message}`,
+    };
   }
 
   revalidatePath("/admin/images");
   revalidatePath("/admin");
+
+  return {
+    status: "success",
+    message: "Image created successfully.",
+  };
 }
 
 export async function updateImageAction(formData: FormData) {

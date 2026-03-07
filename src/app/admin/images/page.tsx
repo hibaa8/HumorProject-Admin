@@ -1,4 +1,5 @@
-import { createImageAction, deleteImageAction, updateImageAction } from "@/app/admin/images/actions";
+import { deleteImageAction, updateImageAction } from "@/app/admin/images/actions";
+import { CreateImageForm } from "@/app/admin/images/create-image-form";
 import { requireSuperadmin } from "@/lib/auth";
 
 export default async function ImagesPage({
@@ -47,42 +48,7 @@ export default async function ImagesPage({
 
       <section className="rounded-2xl border border-emerald-900 bg-emerald-950/20 p-5">
         <h3 className="text-lg font-semibold">Create image</h3>
-        <form action={createImageAction} className="mt-4 grid gap-3 md:grid-cols-2">
-          <input name="url" placeholder="URL" className="rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm" />
-          <input
-            name="profile_id"
-            placeholder="Profile UUID (optional)"
-            className="rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm"
-          />
-          <input
-            name="image_description"
-            placeholder="Image description"
-            className="rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm"
-          />
-          <input
-            name="additional_context"
-            placeholder="Additional context"
-            className="rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm"
-          />
-          <input
-            name="celebrity_recognition"
-            placeholder="Celebrity recognition"
-            className="rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm"
-          />
-          <div className="flex items-center gap-4 text-sm text-zinc-300">
-            <label className="inline-flex items-center gap-2">
-              <input type="checkbox" name="is_public" />
-              Public
-            </label>
-            <label className="inline-flex items-center gap-2">
-              <input type="checkbox" name="is_common_use" />
-              Common use
-            </label>
-          </div>
-          <button className="rounded-md bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-950 md:col-span-2 md:w-fit">
-            Create image
-          </button>
-        </form>
+        <CreateImageForm />
       </section>
 
       <section className="space-y-4">
@@ -92,7 +58,7 @@ export default async function ImagesPage({
               <p className="truncate text-xs text-zinc-400">{image.id}</p>
               <form action={deleteImageAction}>
                 <input type="hidden" name="id" value={image.id} />
-                <button className="rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500">
+                <button className="rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-500 hover:shadow-md hover:shadow-red-500/20">
                   Delete
                 </button>
               </form>
