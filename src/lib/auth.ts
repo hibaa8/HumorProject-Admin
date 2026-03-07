@@ -11,24 +11,6 @@ type AdminProfile = {
 
 export const requireSuperadmin = async () => {
   const supabase = await createSupabaseServerClient();
-  // Temporary bypass requested by user: allow direct dashboard access
-  // without Google/session/superadmin checks.
-  const bypassAuthForNow = true;
-
-  if (bypassAuthForNow) {
-    return {
-      supabase,
-      user: null,
-      profile: {
-        id: "temporary-bypass",
-        email: null,
-        first_name: "Temporary",
-        last_name: "Bypass",
-        is_superadmin: true,
-      } satisfies AdminProfile,
-    };
-  }
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -48,7 +30,7 @@ export const requireSuperadmin = async () => {
     .ilike("email", userEmail)
     .maybeSingle<AdminProfile>();
 
-  if (error || !profile?.is_superadmin) {
+  if (error || !profile?.email || !profile.is_superadmin) {
     redirect("/not-authorized");
   }
 
