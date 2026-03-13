@@ -33,7 +33,7 @@ export default async function ImagesPage({
     <div className="space-y-6">
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
         <h2 className="text-xl font-semibold">Image management</h2>
-        <p className="mt-1 text-sm text-zinc-400">Create, update, and delete rows in public.images.</p>
+        <p className="mt-1 text-sm text-zinc-400">Create, update, and delete rows in public.images, including file upload.</p>
 
         <form className="mt-4 flex gap-2" method="get">
           <input

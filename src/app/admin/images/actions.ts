@@ -2,12 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireSuperadmin } from "@/lib/auth";
-
-const parseChecked = (value: FormDataEntryValue | null) => value === "on";
-const parseNullableText = (value: FormDataEntryValue | null) => {
-  const text = String(value ?? "").trim();
-  return text.length > 0 ? text : null;
-};
+import { parseChecked, parseNullableText } from "@/lib/admin/form-utils";
 
 export type ImageActionState = {
   status: "idle" | "success" | "error";
@@ -31,8 +26,36 @@ export async function createImageAction(
     };
   }
 
+  let url = parseNullableText(formData.get("url"));
+  const imageFile = formData.get("image_file");
+  const uploadBucket = process.env.SUPABASE_IMAGE_UPLOAD_BUCKET ?? "images";
+
+  if (imageFile instanceof File && imageFile.size > 0) {
+    const extension = imageFile.name.includes(".")
+      ? imageFile.name.split(".").pop()
+      : undefined;
+    const objectPath = `${effectiveProfileId}/${Date.now()}-${crypto.randomUUID()}${extension ? `.${extension}` : ""}`;
+    const { error: uploadError } = await supabase.storage
+      .from(uploadBucket)
+      .upload(objectPath, imageFile, {
+        contentType: imageFile.type || undefined,
+      });
+
+    if (uploadError) {
+      return {
+        status: "error",
+        message: `Could not upload image file: ${uploadError.message}`,
+      };
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from(uploadBucket)
+      .getPublicUrl(objectPath);
+    url = publicUrlData.publicUrl;
+  }
+
   const { error } = await supabase.from("images").insert({
-    url: parseNullableText(formData.get("url")),
+    url,
     profile_id: effectiveProfileId,
     image_description: parseNullableText(formData.get("image_description")),
     additional_context: parseNullableText(formData.get("additional_context")),

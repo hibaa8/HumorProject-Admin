@@ -15,10 +15,16 @@ export function CreateImageForm() {
   );
 
   return (
-    <form action={formAction} className="mt-4 grid gap-3 md:grid-cols-2">
+    <form action={formAction} className="mt-4 grid gap-3 md:grid-cols-2" encType="multipart/form-data">
       <input
         name="url"
-        placeholder="URL"
+        placeholder="URL (optional if uploading file)"
+        className="rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm"
+      />
+      <input
+        type="file"
+        name="image_file"
+        accept="image/*"
         className="rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm"
       />
       <input

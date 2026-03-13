@@ -36,13 +36,49 @@ export default async function AdminLayout({
             Dashboard
           </Link>
           <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/profiles" prefetch={false}>
-            Profiles (Read)
+            Users / Profiles (Read)
           </Link>
           <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/images" prefetch={false}>
             Images (CRUD)
           </Link>
           <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/captions" prefetch={false}>
             Captions (Read)
+          </Link>
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/caption-requests" prefetch={false}>
+            Caption Requests (Read)
+          </Link>
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/caption-examples" prefetch={false}>
+            Caption Examples (CRUD)
+          </Link>
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/humor-flavors" prefetch={false}>
+            Humor Flavors (Read)
+          </Link>
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/humor-flavor-steps" prefetch={false}>
+            Humor Flavor Steps (Read)
+          </Link>
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/humor-mix" prefetch={false}>
+            Humor Mix (Read/Update)
+          </Link>
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/terms" prefetch={false}>
+            Terms (CRUD)
+          </Link>
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/llm-providers" prefetch={false}>
+            LLM Providers (CRUD)
+          </Link>
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/llm-models" prefetch={false}>
+            LLM Models (CRUD)
+          </Link>
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/llm-prompt-chains" prefetch={false}>
+            LLM Prompt Chains (Read)
+          </Link>
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/llm-responses" prefetch={false}>
+            LLM Responses (Read)
+          </Link>
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/allowed-signup-domains" prefetch={false}>
+            Allowed Signup Domains (CRUD)
+          </Link>
+          <Link className="block rounded-md bg-zinc-900 px-3 py-2 text-sm hover:bg-zinc-800" href="/admin/whitelist-email-addresses" prefetch={false}>
+            Whitelist Emails (CRUD)
           </Link>
         </aside>
         <main>{children}</main>
