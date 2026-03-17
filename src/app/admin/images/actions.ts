@@ -83,12 +83,15 @@ export async function createImageAction(
   };
 }
 
-export async function updateImageAction(formData: FormData) {
+export async function updateImageAction(
+  _prevState: ImageActionState,
+  formData: FormData
+): Promise<ImageActionState> {
   const { supabase } = await requireSuperadmin();
 
   const id = parseNullableText(formData.get("id"));
   if (!id) {
-    throw new Error("Image id is required.");
+    return { status: "error", message: "Image id is required." };
   }
 
   const profileId = parseNullableText(formData.get("profile_id"));
@@ -108,27 +111,32 @@ export async function updateImageAction(formData: FormData) {
     .eq("id", id);
 
   if (error) {
-    throw new Error(`Update image failed: ${error.message}`);
+    return { status: "error", message: `Update image failed: ${error.message}` };
   }
 
   revalidatePath("/admin/images");
   revalidatePath("/admin");
+  return { status: "success", message: "Image updated." };
 }
 
-export async function deleteImageAction(formData: FormData) {
+export async function deleteImageAction(
+  _prevState: ImageActionState,
+  formData: FormData
+): Promise<ImageActionState> {
   const { supabase } = await requireSuperadmin();
 
   const id = parseNullableText(formData.get("id"));
   if (!id) {
-    throw new Error("Image id is required.");
+    return { status: "error", message: "Image id is required." };
   }
 
   const { error } = await supabase.from("images").delete().eq("id", id);
 
   if (error) {
-    throw new Error(`Delete image failed: ${error.message}`);
+    return { status: "error", message: `Delete image failed: ${error.message}` };
   }
 
   revalidatePath("/admin/images");
   revalidatePath("/admin");
+  return { status: "success", message: "Image deleted." };
 }

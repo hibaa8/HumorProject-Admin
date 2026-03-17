@@ -1,5 +1,5 @@
-import { updateHumorMixAction } from "@/app/admin/humor-mix/actions";
 import { requireSuperadmin } from "@/lib/auth";
+import { HumorMixRowForm } from "./forms";
 
 type HumorMixRow = {
   id: number;
@@ -32,25 +32,11 @@ export default async function HumorMixPage() {
       <section className="space-y-3">
         {rows.map((row) => {
           const flavor = row.humor_flavors && !Array.isArray(row.humor_flavors) ? row.humor_flavors.slug : "unknown";
-
           return (
-            <article key={row.id} className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-              <p className="text-sm text-zinc-400">Flavor: {flavor} (id: {row.humor_flavor_id})</p>
-              <form action={updateHumorMixAction} className="mt-3 flex flex-wrap items-end gap-3">
-                <input type="hidden" name="id" value={row.id} />
-                <label className="text-sm text-zinc-300">
-                  Caption count
-                  <input
-                    type="number"
-                    name="caption_count"
-                    min={0}
-                    defaultValue={row.caption_count}
-                    className="mt-1 block rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm"
-                  />
-                </label>
-                <button className="rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-zinc-950">Save</button>
-              </form>
-            </article>
+            <HumorMixRowForm
+              key={row.id}
+              row={{ id: row.id, caption_count: row.caption_count, flavorLabel: `Flavor: ${flavor} (id: ${row.humor_flavor_id})` }}
+            />
           );
         })}
       </section>

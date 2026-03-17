@@ -4,7 +4,15 @@ import { revalidatePath } from "next/cache";
 import { requireSuperadmin } from "@/lib/auth";
 import { parseInteger, parseNullableText } from "@/lib/admin/form-utils";
 
-export async function createTermAction(formData: FormData) {
+export type ActionState = {
+  status: "idle" | "success" | "error";
+  message: string;
+};
+
+export async function createTermAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const { supabase } = await requireSuperadmin();
 
   const term = parseNullableText(formData.get("term"));
@@ -12,7 +20,7 @@ export async function createTermAction(formData: FormData) {
   const example = parseNullableText(formData.get("example"));
 
   if (!term || !definition || !example) {
-    throw new Error("term, definition, and example are required.");
+    return { status: "error", message: "term, definition, and example are required." };
   }
 
   const { error } = await supabase.from("terms").insert({
@@ -24,18 +32,22 @@ export async function createTermAction(formData: FormData) {
   });
 
   if (error) {
-    throw new Error(`Could not create term: ${error.message}`);
+    return { status: "error", message: `Could not create term: ${error.message}` };
   }
 
   revalidatePath("/admin/terms");
+  return { status: "success", message: "Term created." };
 }
 
-export async function updateTermAction(formData: FormData) {
+export async function updateTermAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const { supabase } = await requireSuperadmin();
 
   const id = parseInteger(formData.get("id"));
   if (!id) {
-    throw new Error("Term id is required.");
+    return { status: "error", message: "Term id is required." };
   }
 
   const term = parseNullableText(formData.get("term"));
@@ -43,7 +55,7 @@ export async function updateTermAction(formData: FormData) {
   const example = parseNullableText(formData.get("example"));
 
   if (!term || !definition || !example) {
-    throw new Error("term, definition, and example are required.");
+    return { status: "error", message: "term, definition, and example are required." };
   }
 
   const { error } = await supabase
@@ -59,25 +71,30 @@ export async function updateTermAction(formData: FormData) {
     .eq("id", id);
 
   if (error) {
-    throw new Error(`Could not update term: ${error.message}`);
+    return { status: "error", message: `Could not update term: ${error.message}` };
   }
 
   revalidatePath("/admin/terms");
+  return { status: "success", message: "Term updated." };
 }
 
-export async function deleteTermAction(formData: FormData) {
+export async function deleteTermAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const { supabase } = await requireSuperadmin();
 
   const id = parseInteger(formData.get("id"));
   if (!id) {
-    throw new Error("Term id is required.");
+    return { status: "error", message: "Term id is required." };
   }
 
   const { error } = await supabase.from("terms").delete().eq("id", id);
 
   if (error) {
-    throw new Error(`Could not delete term: ${error.message}`);
+    return { status: "error", message: `Could not delete term: ${error.message}` };
   }
 
   revalidatePath("/admin/terms");
+  return { status: "success", message: "Term deleted." };
 }

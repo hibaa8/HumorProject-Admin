@@ -4,12 +4,20 @@ import { revalidatePath } from "next/cache";
 import { requireSuperadmin } from "@/lib/auth";
 import { parseInteger, parseNullableText } from "@/lib/admin/form-utils";
 
-export async function createAllowedSignupDomainAction(formData: FormData) {
+export type ActionState = {
+  status: "idle" | "success" | "error";
+  message: string;
+};
+
+export async function createAllowedSignupDomainAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const { supabase } = await requireSuperadmin();
 
   const apexDomain = parseNullableText(formData.get("apex_domain"));
   if (!apexDomain) {
-    throw new Error("apex_domain is required.");
+    return { status: "error", message: "apex_domain is required." };
   }
 
   const { error } = await supabase.from("allowed_signup_domains").insert({
@@ -17,19 +25,23 @@ export async function createAllowedSignupDomainAction(formData: FormData) {
   });
 
   if (error) {
-    throw new Error(`Could not create domain: ${error.message}`);
+    return { status: "error", message: `Could not create domain: ${error.message}` };
   }
 
   revalidatePath("/admin/allowed-signup-domains");
+  return { status: "success", message: "Domain created." };
 }
 
-export async function updateAllowedSignupDomainAction(formData: FormData) {
+export async function updateAllowedSignupDomainAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const { supabase } = await requireSuperadmin();
 
   const id = parseInteger(formData.get("id"));
   const apexDomain = parseNullableText(formData.get("apex_domain"));
   if (!id || !apexDomain) {
-    throw new Error("id and apex_domain are required.");
+    return { status: "error", message: "id and apex_domain are required." };
   }
 
   const { error } = await supabase
@@ -38,25 +50,30 @@ export async function updateAllowedSignupDomainAction(formData: FormData) {
     .eq("id", id);
 
   if (error) {
-    throw new Error(`Could not update domain: ${error.message}`);
+    return { status: "error", message: `Could not update domain: ${error.message}` };
   }
 
   revalidatePath("/admin/allowed-signup-domains");
+  return { status: "success", message: "Domain updated." };
 }
 
-export async function deleteAllowedSignupDomainAction(formData: FormData) {
+export async function deleteAllowedSignupDomainAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const { supabase } = await requireSuperadmin();
 
   const id = parseInteger(formData.get("id"));
   if (!id) {
-    throw new Error("id is required.");
+    return { status: "error", message: "id is required." };
   }
 
   const { error } = await supabase.from("allowed_signup_domains").delete().eq("id", id);
 
   if (error) {
-    throw new Error(`Could not delete domain: ${error.message}`);
+    return { status: "error", message: `Could not delete domain: ${error.message}` };
   }
 
   revalidatePath("/admin/allowed-signup-domains");
+  return { status: "success", message: "Domain deleted." };
 }

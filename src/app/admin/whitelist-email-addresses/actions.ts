@@ -4,12 +4,20 @@ import { revalidatePath } from "next/cache";
 import { requireSuperadmin } from "@/lib/auth";
 import { parseInteger, parseNullableText } from "@/lib/admin/form-utils";
 
-export async function createWhitelistEmailAction(formData: FormData) {
+export type ActionState = {
+  status: "idle" | "success" | "error";
+  message: string;
+};
+
+export async function createWhitelistEmailAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const { supabase } = await requireSuperadmin();
 
   const emailAddress = parseNullableText(formData.get("email_address"));
   if (!emailAddress) {
-    throw new Error("email_address is required.");
+    return { status: "error", message: "email_address is required." };
   }
 
   const { error } = await supabase.from("whitelist_email_addresses").insert({
@@ -17,19 +25,23 @@ export async function createWhitelistEmailAction(formData: FormData) {
   });
 
   if (error) {
-    throw new Error(`Could not create whitelist email: ${error.message}`);
+    return { status: "error", message: `Could not create whitelist email: ${error.message}` };
   }
 
   revalidatePath("/admin/whitelist-email-addresses");
+  return { status: "success", message: "Email added to whitelist." };
 }
 
-export async function updateWhitelistEmailAction(formData: FormData) {
+export async function updateWhitelistEmailAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const { supabase } = await requireSuperadmin();
 
   const id = parseInteger(formData.get("id"));
   const emailAddress = parseNullableText(formData.get("email_address"));
   if (!id || !emailAddress) {
-    throw new Error("id and email_address are required.");
+    return { status: "error", message: "id and email_address are required." };
   }
 
   const { error } = await supabase
@@ -41,25 +53,30 @@ export async function updateWhitelistEmailAction(formData: FormData) {
     .eq("id", id);
 
   if (error) {
-    throw new Error(`Could not update whitelist email: ${error.message}`);
+    return { status: "error", message: `Could not update whitelist email: ${error.message}` };
   }
 
   revalidatePath("/admin/whitelist-email-addresses");
+  return { status: "success", message: "Email updated." };
 }
 
-export async function deleteWhitelistEmailAction(formData: FormData) {
+export async function deleteWhitelistEmailAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const { supabase } = await requireSuperadmin();
 
   const id = parseInteger(formData.get("id"));
   if (!id) {
-    throw new Error("id is required.");
+    return { status: "error", message: "id is required." };
   }
 
   const { error } = await supabase.from("whitelist_email_addresses").delete().eq("id", id);
 
   if (error) {
-    throw new Error(`Could not delete whitelist email: ${error.message}`);
+    return { status: "error", message: `Could not delete whitelist email: ${error.message}` };
   }
 
   revalidatePath("/admin/whitelist-email-addresses");
+  return { status: "success", message: "Email removed from whitelist." };
 }

@@ -4,7 +4,15 @@ import { revalidatePath } from "next/cache";
 import { requireSuperadmin } from "@/lib/auth";
 import { parseInteger, parseNullableText } from "@/lib/admin/form-utils";
 
-export async function createCaptionExampleAction(formData: FormData) {
+export type ActionState = {
+  status: "idle" | "success" | "error";
+  message: string;
+};
+
+export async function createCaptionExampleAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const { supabase } = await requireSuperadmin();
 
   const imageDescription = parseNullableText(formData.get("image_description"));
@@ -12,7 +20,7 @@ export async function createCaptionExampleAction(formData: FormData) {
   const explanation = parseNullableText(formData.get("explanation"));
 
   if (!imageDescription || !caption || !explanation) {
-    throw new Error("image_description, caption, and explanation are required.");
+    return { status: "error", message: "image_description, caption, and explanation are required." };
   }
 
   const { error } = await supabase.from("caption_examples").insert({
@@ -24,18 +32,22 @@ export async function createCaptionExampleAction(formData: FormData) {
   });
 
   if (error) {
-    throw new Error(`Could not create caption example: ${error.message}`);
+    return { status: "error", message: `Could not create caption example: ${error.message}` };
   }
 
   revalidatePath("/admin/caption-examples");
+  return { status: "success", message: "Caption example created." };
 }
 
-export async function updateCaptionExampleAction(formData: FormData) {
+export async function updateCaptionExampleAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const { supabase } = await requireSuperadmin();
 
   const id = parseInteger(formData.get("id"));
   if (!id) {
-    throw new Error("Caption example id is required.");
+    return { status: "error", message: "Caption example id is required." };
   }
 
   const imageDescription = parseNullableText(formData.get("image_description"));
@@ -43,7 +55,7 @@ export async function updateCaptionExampleAction(formData: FormData) {
   const explanation = parseNullableText(formData.get("explanation"));
 
   if (!imageDescription || !caption || !explanation) {
-    throw new Error("image_description, caption, and explanation are required.");
+    return { status: "error", message: "image_description, caption, and explanation are required." };
   }
 
   const { error } = await supabase
@@ -59,25 +71,30 @@ export async function updateCaptionExampleAction(formData: FormData) {
     .eq("id", id);
 
   if (error) {
-    throw new Error(`Could not update caption example: ${error.message}`);
+    return { status: "error", message: `Could not update caption example: ${error.message}` };
   }
 
   revalidatePath("/admin/caption-examples");
+  return { status: "success", message: "Caption example updated." };
 }
 
-export async function deleteCaptionExampleAction(formData: FormData) {
+export async function deleteCaptionExampleAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const { supabase } = await requireSuperadmin();
 
   const id = parseInteger(formData.get("id"));
   if (!id) {
-    throw new Error("Caption example id is required.");
+    return { status: "error", message: "Caption example id is required." };
   }
 
   const { error } = await supabase.from("caption_examples").delete().eq("id", id);
 
   if (error) {
-    throw new Error(`Could not delete caption example: ${error.message}`);
+    return { status: "error", message: `Could not delete caption example: ${error.message}` };
   }
 
   revalidatePath("/admin/caption-examples");
+  return { status: "success", message: "Caption example deleted." };
 }
